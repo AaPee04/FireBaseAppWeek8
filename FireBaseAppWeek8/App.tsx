@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, TextInput, FlatList, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { getItems, addItem, deleteItem } from "./firebase/itemService";
 
 export default function App() {
@@ -17,47 +18,49 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={styles.container}>
 
-      <Text style={styles.title}>Shopping List</Text>
+        <Text style={styles.title}>Shopping List</Text>
 
-      <View style={styles.inputRow}>
-        <TextInput
-          style={styles.input}
-          placeholder="Add item"
-          value={text}
-          onChangeText={setText}
+        <View style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            placeholder="Add item"
+            value={text}
+            onChangeText={setText}
+          />
+
+          <Button
+            title="Add"
+            onPress={async () => {
+              if (!text.trim()) return;
+              await addItem(text);
+              setText("");
+              loadItems();
+            }}
+          />
+        </View>
+
+        <FlatList
+          data={items}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.itemRow}>
+              <Text style={styles.itemText}>{item.name}</Text>
+              <Button
+                title="Delete"
+                onPress={async () => {
+                  await deleteItem(item.id);
+                  loadItems();
+                }}
+              />
+            </View>
+          )}
         />
 
-        <Button
-          title="Add"
-          onPress={async () => {
-            if (!text.trim()) return;
-            await addItem(text);
-            setText("");
-            loadItems();
-          }}
-        />
       </View>
-
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.itemRow}>
-            <Text style={styles.itemText}>{item.name}</Text>
-            <Button
-              title="Delete"
-              onPress={async () => {
-                await deleteItem(item.id);
-                loadItems();
-              }}
-            />
-          </View>
-        )}
-      />
-
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -65,7 +68,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 40,
-    marginTop: 40,
     backgroundColor: "#fff",
   },
 

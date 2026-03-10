@@ -18,8 +18,12 @@ export const getItems = async () => {
 // Add data
 export const addItem = async (name: string) => {
   console.log("Adding item:", name);
-  await addDoc(collection(db, collectionName), { name });
-  console.log("Item added!");
+  try {
+    await addDoc(collection(db, collectionName), { name });
+    console.log("Item added!");
+  } catch (err) {
+    console.log("Firestore error:", err);
+  }
 };
 
 
